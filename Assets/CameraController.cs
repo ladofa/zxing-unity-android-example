@@ -10,13 +10,14 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //카메라를 시작합니다.
+        //start camera
         Debug.Log("Script has been started...");
         plane = GameObject.FindWithTag("Player");
 
         mCamera = new WebCamTexture();
-        //카메라 텍스쳐를 3D객체에 할당
+        //attach my WebCamCamera to specific texture
         plane.GetComponent<Renderer>().material.mainTexture = mCamera;
+        //I think it starts independent thread to operate the camera.
         mCamera.Play();
     }
 
@@ -25,14 +26,16 @@ public class CameraController : MonoBehaviour
         ZXing.QrCode.QRCodeReader reader = new ZXing.QrCode.QRCodeReader();
         try
         {
-            //소스 영상을 넣습니다.
+            //make source
             var source = new ZXing.Color32LuminanceSource(c, width, height);
-            //RGB raw 영상일 경우
+            //in case of RGB raw
             //var source = new ZXing.RGBLuminanceSource(rgb, width, height);
+            //also you can use another ZXing.xxxLuminanceSource
+
             var binarizer = new ZXing.Common.HybridBinarizer(source);
             var binBitmap = new ZXing.BinaryBitmap(binarizer);
 
-            //실패할 경우 여기서 익셉션 발생
+            //raise exception if the reader couldn't recognize it
             string text = reader.decode(binBitmap).Text;
             
             GameObject.Find("Text").GetComponent<UnityEngine.UI.Text>().text = text;
@@ -49,7 +52,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //매번 업데이트때마다 카메라로부터 영상을 불러옴
+        //reload current image
         DecodeQR(mCamera.GetPixels32(), mCamera.width, mCamera.height);
     }
 }
