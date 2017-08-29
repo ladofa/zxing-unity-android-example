@@ -1,2 +1,3 @@
 # zxing-unity-android-example
-An zxing.net example for unity, android
+
+This is very very simple example for https://github.com/micjahn/ZXing.Net
