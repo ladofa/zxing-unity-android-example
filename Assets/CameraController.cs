@@ -4,32 +4,41 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
+/**
+ * @brief 스캔 결과를 받아올 수 있는 이벤트
+ */
+
 public class ScanResultUpdatedHandler : UnityEvent<string>
 {
 
 }
 
+/**
+ * @brief 카메라로부터 이미지를 받아와서 QR 코드를 인식하고, 그 결과를 이벤트로 내보낸다.
+ */
 public class CameraController : MonoBehaviour
 {
     public WebCamTexture mCamera = null;
     public GameObject plane;
 	public ScanResultUpdatedHandler ScanResultUpdated = new ScanResultUpdatedHandler();
 
-    // Use this for initialization
+    /**
+	 * @brief 시작 시, 카메라 로드
+	 */
     void Start()
     {
         //start camera
         Debug.Log("Script has been started...");
-        plane = GameObject.FindWithTag("Player");
 
-        mCamera = new WebCamTexture();
-        //attach my WebCamCamera to specific texture
-        plane.GetComponent<Renderer>().material.mainTexture = mCamera;
+        mCamera = new WebCamTexture();        
         //I think it starts independent thread to operate the camera.
         mCamera.Play();
     }
 
-    void DecodeQR(Color32[] c, int width, int height)
+	/**
+	 * @brief 이미지를 받아와서 QRCode를 해석한다.
+	 */
+	void DecodeQR(Color32[] c, int width, int height)
     {
         ZXing.QrCode.QRCodeReader reader = new ZXing.QrCode.QRCodeReader();
 
@@ -38,8 +47,6 @@ public class CameraController : MonoBehaviour
             //make source
             var source = new ZXing.Color32LuminanceSource(c, width, height);
             //in case of RGB raw
-            //var source = new ZXing.RGBLuminanceSource(rgb, width, height);
-            //also you can use another ZXing.xxxLuminanceSource
 
             var binarizer = new ZXing.Common.HybridBinarizer(source);
             var binBitmap = new ZXing.BinaryBitmap(binarizer);
@@ -65,8 +72,7 @@ public class CameraController : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
+	void Update()
     {
         //reload current image
         DecodeQR(mCamera.GetPixels32(), mCamera.width, mCamera.height);
