@@ -1,11 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
+
+public class ScanResultUpdatedHandler : UnityEvent<string>
+{
+
+}
 
 public class CameraController : MonoBehaviour
 {
     public WebCamTexture mCamera = null;
     public GameObject plane;
+	public ScanResultUpdatedHandler ScanResultUpdated = new ScanResultUpdatedHandler();
 
     // Use this for initialization
     void Start()
@@ -24,6 +32,7 @@ public class CameraController : MonoBehaviour
     void DecodeQR(Color32[] c, int width, int height)
     {
         ZXing.QrCode.QRCodeReader reader = new ZXing.QrCode.QRCodeReader();
+
         try
         {
             //make source
@@ -37,14 +46,21 @@ public class CameraController : MonoBehaviour
 
             //raise exception if the reader couldn't recognize it
             string text = reader.decode(binBitmap).Text;
-            
-            GameObject.Find("Text").GetComponent<UnityEngine.UI.Text>().text = text;
-            Debug.Log(text);
+
+			if (ScanResultUpdated != null)
+			{
+				ScanResultUpdated.Invoke(text);
+			}
+
+			Debug.Log(text);
         }
         catch
         {
-            GameObject.Find("Text").GetComponent<UnityEngine.UI.Text>().text = "decoding failed";
-            Debug.Log("decoding failed.");
+			if (ScanResultUpdated != null)
+			{
+				ScanResultUpdated.Invoke("");
+			}
+			Debug.Log("decoding failed.");
         }
 
     }
